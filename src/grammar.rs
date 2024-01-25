@@ -63,7 +63,7 @@
 ///     pub _count: u32,
 /// }
 /// ```
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Token {
     MoveBack = '<' as isize,
     MoveForward = '>' as isize,
@@ -83,6 +83,6 @@ pub enum Expression {
 
 #[derive(Debug)]
 pub struct Operators {
-    pub _type_name: Token,
-    pub _count: u32,
+    pub type_name_: Token,
+    pub count_: u32,
 }
