@@ -53,12 +53,12 @@
 /// }
 /// ```
 ///
-/// # Operators
+/// # Operator
 /// Struct representing operators with type and count.
 ///
 /// ```
 /// #[derive(Debug)]
-/// pub struct Operators {
+/// pub struct Operator {
 ///     pub _type_name: Token,
 ///     pub _count: u32,
 /// }
@@ -78,11 +78,11 @@ pub enum Token {
 #[derive(Debug)]
 pub enum Expression {
     Loop(Vec<Expression>),
-    Operator(Box<Operators>),
+    Operator(Box<Operator>),
 }
 
 #[derive(Debug)]
-pub struct Operators {
+pub struct Operator {
     pub type_name_: Token,
     pub count_: u32,
 }
