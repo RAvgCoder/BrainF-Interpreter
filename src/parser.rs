@@ -3,7 +3,7 @@ use crate::lexer::Lexer;
 
 #[derive(Debug)]
 pub struct Parser {
-    tokens_: Vec<Token>,
+    lexer_: Lexer,
     parser_index_: usize,
     should_optimise_: bool,
 }
@@ -11,7 +11,7 @@ pub struct Parser {
 impl Parser {
     pub fn new(program: String, optimise: bool) -> Self {
         Parser {
-            tokens_: Lexer::new(program).tokens(),
+            lexer_: Lexer::new(program),
             parser_index_: 0,
             should_optimise_: optimise,
         }
@@ -30,8 +30,8 @@ impl Parser {
     fn parse_to_ast(&mut self) -> Vec<Expression> {
         let mut expresions: Vec<Expression> = vec![];
 
-        while self.parser_index_ < self.tokens_.len() {
-            let token = self.tokens_[self.parser_index_];
+        while self.parser_index_ < self.lexer_.tokens().len() {
+            let token = self.lexer_.tokens()[self.parser_index_];
             self.parser_index_ += 1;
 
             expresions.push(
