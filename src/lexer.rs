@@ -4,11 +4,19 @@ use colored::{Colorize};
 /// Struct representing a lexer for a custom language.
 #[derive(Debug)]
 pub struct Lexer {
-    tokens_: Vec<Token>,   // Vector to store tokens
-    line_num_: u32,        // Line number in the program
-    line_idx_: u32,        // Character index in the current line
-    brace_stack_: i32,     // Stack to track '[' and ']' pairs
-    ptr_sim_: i32,         // Pointer simulation value
+    // The index to the program string being parsed
+    // lexer_index_: usize,
+    // Vector to store tokens
+    tokens_: Vec<Token>,
+    // // Line number in the program
+    line_num_: usize,
+    // // Character index in the current line
+    line_idx_: usize,
+    // Stack to track '[' and ']' pairs
+    brace_stack_: i32,
+    // Pointer simulation value
+    ptr_sim_: i32,
+
 }
 
 impl Lexer {
@@ -23,6 +31,7 @@ impl Lexer {
     /// A new instance of `Lexer`.
     pub fn new(program: String) -> Self {
         let mut lex = Lexer {
+            // lexer_index_: 0,
             tokens_: vec![],
             line_num_: 1,
             line_idx_: 0,
@@ -42,51 +51,58 @@ impl Lexer {
     /// * `program` - The program string to be tokenized.
     fn tokenize(&mut self, program: &String) {
         // Iterate through characters in the program
-        for (idx, c) in program.chars().enumerate() {
-            self.line_idx_ += 1;
-            match c {
-                '>' => {
-                    self.ptr_sim_ += 1;
-                    self.tokens_.push(Token::MoveForward)
-                }
-                '<' => {
-                    self.ptr_sim_ -= 1;
-                    if self.ptr_sim_ < 0 {
-                        self.throw_run_err(program, idx, "Index runs out of bounds");
+        for (line_num, line) in program.lines().enumerate() {
+            self.line_num_ = line_num + 1;
+            for (char_index, curr_char) in line.chars().enumerate() {
+                self.line_idx_ = char_index;
+                match curr_char {
+                    '>' => {
+                        self.ptr_sim_ += 1;
+                        self.tokens_.push(Token::MoveForward);
                     }
-                    self.tokens_.push(Token::MoveBack)
-                }
-                '+' => self.tokens_.push(Token::Add),
-                '-' => self.tokens_.push(Token::Sub),
-                '.' => self.tokens_.push(Token::StdOut),
-                ',' => self.tokens_.push(Token::StdIn),
-                '[' => {
-                    self.brace_stack_ += 1;
-                    self.tokens_.push(Token::LoopStart)
-                }
-                ']' => {
-                    self.brace_stack_ -= 1;
-                    if self.brace_stack_ < 0 {
-                        self.throw_run_err(program, idx,
-                                           "Not enough matches for ']'");
+                    '<' => {
+                        self.ptr_sim_ -= 1;
+                        if self.ptr_sim_ < 0 {
+                            self.throw_run_err(line, char_index, "Index runs out of bounds");
+                        }
+                        self.tokens_.push(Token::MoveBack);
                     }
-                    self.tokens_.push(Token::LoopEnd)
-                }
-                _ => {
-                    // new_line
-                    if c == Self::new_line() {
-                        self.line_num_ += 1;
-                        self.line_idx_ = 0;
+                    '+' => self.tokens_.push(Token::Add),
+                    '-' => self.tokens_.push(Token::Sub),
+                    '.' => self.tokens_.push(Token::StdOut),
+                    ',' => self.tokens_.push(Token::StdIn),
+                    '[' => {
+                        self.brace_stack_ += 1;
+                        self.tokens_.push(Token::LoopStart);
+                    }
+                    ']' => {
+                        self.brace_stack_ -= 1;
+                        if self.brace_stack_ < 0 {
+                            self.throw_run_err(line, char_index, "Not enough matches for ']'");
+                        }
+                        self.tokens_.push(Token::LoopEnd);
+                    }
+                    _ => {
+                        if curr_char.is_whitespace() {
+                            continue;
+                        }
+
+                        /*
+                            If comments are seen then stop reading
+                            the current line and move to the next
+                         */
+                        break;
                     }
                 }
             }
         }
+
         // Check for unbalanced '[' brackets
         if self.brace_stack_ > 0 {
-            self.throw_run_err(program, program.len() - 1,
-                               &format!("An Excess of {} '[' brackets were found", self.brace_stack_));
+            self.throw_run_err(program, program.len() - 1, &format!("An Excess of {} '[' brackets were found", self.brace_stack_));
         }
     }
+
 
     /// Function to represent a newline character.
     ///
@@ -102,8 +118,8 @@ impl Lexer {
     /// # Returns
     ///
     /// A reference to the vector of tokens.
-    pub fn tokens(self) -> Vec<Token> {
-        self.tokens_
+    pub fn tokens(&self) -> &Vec<Token> {
+        &self.tokens_
     }
 
     /// Function to handle and print runtime errors.
