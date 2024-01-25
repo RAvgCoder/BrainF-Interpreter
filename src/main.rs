@@ -18,12 +18,6 @@ fn main() {
 
     let ast = parser.generate_ast();
 
-
-    for e in &ast {
-        println!("{:#?}", e);
-    }
-
-
     println!("{:#?}", parser);
 }
 
