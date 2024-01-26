@@ -4,8 +4,6 @@ use colored::{Colorize};
 /// Struct representing a lexer for a custom language.
 #[derive(Debug)]
 pub struct Lexer {
-    // The index to the program string being parsed
-    // lexer_index_: usize,
     // Vector to store tokens
     tokens_: Vec<Token>,
     // // Line number in the program
@@ -16,7 +14,6 @@ pub struct Lexer {
     brace_stack_: i32,
     // Pointer simulation value
     ptr_sim_: i32,
-
 }
 
 impl Lexer {
@@ -129,8 +126,8 @@ impl Lexer {
     /// * `program` - The original program string.
     /// * `lexer_idx` - The index in the lexer where the error occurred.
     /// * `message` - The error message to be displayed.
-    fn throw_run_err(&self, program: &str, lexer_idx: usize, message: &str) {
-        let (err_sub_str, offset) = Self::extract_err_line(program, lexer_idx);
+    fn throw_run_err(&self, line: &str, lexer_idx: usize, message: &str) {
+        let (err_sub_str, offset) = Self::extract_err_line(line, lexer_idx);
         let space = " ".repeat(offset);
         let error = "Error".red();  // Coloring the "Error" string in red
         let line_details = format!("Line={} | Col={}", self.line_num_, self.line_idx_).bold();
@@ -157,23 +154,23 @@ impl Lexer {
     /// # Returns
     ///
     /// A tuple containing the error substring and the offset from the start.
-    fn extract_err_line(program: &str, lexer_idx: usize) -> (&str, usize) {
+    fn extract_err_line(line: &str, lexer_idx: usize) -> (&str, usize) {
         let mut l_ptr = lexer_idx;
         let mut r_ptr = lexer_idx;
 
         // Move left to find the start of the line or newline character
         for _ in 1..10 {
-            if l_ptr as i32 - 1 < 0 || program.chars().nth(l_ptr - 1).unwrap() == Self::new_line() { break; }
+            if l_ptr as i32 - 1 < 0 || line.chars().nth(l_ptr - 1).unwrap() == Self::new_line() { break; }
             l_ptr -= 1;
         }
 
         // Move right to find the end of the line or newline character
         for _ in 1..10 {
-            if r_ptr + 1 >= program.len() || program.chars().nth(r_ptr + 1).unwrap() == Self::new_line() { break; }
+            if r_ptr + 1 >= line.len() || line.chars().nth(r_ptr + 1).unwrap() == Self::new_line() { break; }
             r_ptr += 1;
         }
 
         // Return the substring of the line and the offset from the start
-        (&program[l_ptr..=r_ptr], lexer_idx - l_ptr)
+        (&line[l_ptr..=r_ptr], lexer_idx - l_ptr)
     }
 }
