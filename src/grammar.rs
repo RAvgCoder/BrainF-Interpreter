@@ -83,6 +83,6 @@ pub enum Expression {
 
 #[derive(Debug)]
 pub struct Operator {
-    pub type_name_: Token,
-    pub count_: u32,
+    pub type_name: Token,
+    pub count: usize,
 }
