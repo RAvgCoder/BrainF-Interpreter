@@ -25,11 +25,11 @@ impl<'a> Interpreter<'a> {
     /// # Returns
     ///
     /// A new instance of `Interpreter`.
-    pub fn new(ast: &'a [Expression]) -> Self {
+    pub fn new(syntax_tree: &'a [Expression]) -> Self {
         Interpreter {
             memory_cells: vec![0; 10],
             cell_ptr: 0,
-            syntax_tree: ast,
+            syntax_tree,
         }
     }
 
