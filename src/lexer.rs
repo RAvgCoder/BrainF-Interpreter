@@ -1,5 +1,5 @@
 use crate::grammar::Token;
-use colored::{Colorize};
+use colored::Colorize;
 
 /// Struct representing a lexer for a custom language.
 #[derive(Debug)]
@@ -85,9 +85,9 @@ impl Lexer {
                         }
 
                         /*
-                            If comments are seen then stop reading
-                            the current line and move to the next
-                         */
+                           If comments are seen then stop reading
+                           the current line and move to the next
+                        */
                         break;
                     }
                 }
@@ -96,10 +96,13 @@ impl Lexer {
 
         // Check for unbalanced '[' brackets
         if self.brace_stack_ > 0 {
-            self.throw_run_err(program, program.len() - 1, &format!("An Excess of {} '[' brackets were found", self.brace_stack_));
+            self.throw_run_err(
+                program,
+                program.len() - 1,
+                &format!("An Excess of {} '[' brackets were found", self.brace_stack_),
+            );
         }
     }
-
 
     /// Function to represent a newline character.
     ///
@@ -129,16 +132,20 @@ impl Lexer {
     fn throw_run_err(&self, line: &str, lexer_idx: usize, message: &str) {
         let (err_sub_str, offset) = Self::extract_err_line(line, lexer_idx);
         let space = " ".repeat(offset);
-        let error = "Error".red();  // Coloring the "Error" string in red
+        let error = "Error".red(); // Coloring the "Error" string in red
         let line_details = format!("Line={} | Col={}", self.line_num_, self.line_idx_).bold();
 
         // Printing the error message with color formatting
-        eprintln!(r#"
+        eprintln!(
+            r#"
         {error}: {line_details}
             {}
             {space}^
             {space}|----- {}
-        "#, err_sub_str.white(), message.red());
+        "#,
+            err_sub_str.white(),
+            message.red()
+        );
 
         // Exiting the program with an error code
         std::process::exit(1);
@@ -160,13 +167,17 @@ impl Lexer {
 
         // Move left to find the start of the line or newline character
         for _ in 1..10 {
-            if l_ptr as i32 - 1 < 0 || line.chars().nth(l_ptr - 1).unwrap() == Self::new_line() { break; }
+            if l_ptr as i32 - 1 < 0 || line.chars().nth(l_ptr - 1).unwrap() == Self::new_line() {
+                break;
+            }
             l_ptr -= 1;
         }
 
         // Move right to find the end of the line or newline character
         for _ in 1..10 {
-            if r_ptr + 1 >= line.len() || line.chars().nth(r_ptr + 1).unwrap() == Self::new_line() { break; }
+            if r_ptr + 1 >= line.len() || line.chars().nth(r_ptr + 1).unwrap() == Self::new_line() {
+                break;
+            }
             r_ptr += 1;
         }
 

@@ -1,6 +1,6 @@
-use colored::Colorize;
 use crate::grammar::{Expression, Operator, Token};
 use crate::lexer::Lexer;
+use colored::Colorize;
 
 /// Struct representing a parser for the custom language.
 #[derive(Debug)]
@@ -82,24 +82,16 @@ impl Parser {
             let token = self.lexer.tokens()[self.parser_index];
             self.parser_index += 1;
 
-            expressions.push(
-                match token {
-                    Token::LoopStart => {
-                        Expression::Loop(self.parse_to_ast())
-                    }
-                    Token::LoopEnd => {
-                        return expressions;
-                    }
-                    _ => {
-                        Expression::Operator(
-                            Box::new(Operator {
-                                type_name: token,
-                                count: 1,
-                            })
-                        )
-                    }
+            expressions.push(match token {
+                Token::LoopStart => Expression::Loop(self.parse_to_ast()),
+                Token::LoopEnd => {
+                    return expressions;
                 }
-            );
+                _ => Expression::Operator(Box::new(Operator {
+                    type_name: token,
+                    count: 1,
+                })),
+            });
         }
 
         expressions
@@ -126,7 +118,8 @@ impl Parser {
                 Expression::Operator(new_op) => {
                     match &mut prev {
                         Some(old_op) => {
-                            if new_op.type_name != Token::StdOut && new_op.type_name != Token::StdIn {
+                            if new_op.type_name != Token::StdOut && new_op.type_name != Token::StdIn
+                            {
                                 // Groups non - Std(in/out) tokens
                                 if old_op.type_name == new_op.type_name {
                                     old_op.count += 1;
@@ -147,12 +140,9 @@ impl Parser {
         }
 
         // Delete all operations optimized out
-        nodes_idx
-            .iter()
-            .rev()
-            .for_each(|&idx| {
-                ast.remove(idx);
-            })
+        nodes_idx.iter().rev().for_each(|&idx| {
+            ast.remove(idx);
+        })
     }
 
     /// Counts the number of instructions in the AST.
