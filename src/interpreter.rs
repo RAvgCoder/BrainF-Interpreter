@@ -1,5 +1,5 @@
-use std::io::Read;
 use crate::grammar::{Expression, Operator, Token};
+use std::io::Read;
 
 /// Struct representing an interpreter for the custom language.
 #[derive(Debug)]
@@ -7,7 +7,7 @@ pub struct Interpreter<'a> {
     /// Contains the instructions to execute
     syntax_tree: &'a [Expression],
     /// The memory that the program uses
-    memory_cells: Vec<u8>,
+    cell_memory: Vec<u8>,
     /// Points to the index in the tape to be used
     cell_ptr: usize,
 }
@@ -27,7 +27,7 @@ impl<'a> Interpreter<'a> {
     /// A new instance of `Interpreter`.
     pub fn new(syntax_tree: &'a [Expression]) -> Self {
         Interpreter {
-            memory_cells: vec![0; 10],
+            cell_memory: vec![0; 10],
             cell_ptr: 0,
             syntax_tree,
         }
@@ -127,7 +127,7 @@ impl<'a> Interpreter<'a> {
     ///
     /// The value read from memory.
     fn read_curr_cell(&self) -> u8 {
-        self.memory_cells[self.cell_ptr]
+        self.cell_memory[self.cell_ptr]
     }
 
     /// Writes a value to the memory tape at the current pointer position.
@@ -136,14 +136,14 @@ impl<'a> Interpreter<'a> {
     ///
     /// * `num` - The value to write to memory.
     fn write_to_cell(&mut self, num: u8) {
-        self.memory_cells[self.cell_ptr] = num;
+        self.cell_memory[self.cell_ptr] = num;
     }
 
     /// Grows the memory tape if the current pointer exceeds its size.
     fn grow_cell_memory(&mut self) {
-        if self.cell_ptr == self.memory_cells.len() {
+        if self.cell_ptr >= self.cell_memory.len() {
             for _ in 0..10 {
-                self.memory_cells.push(0);
+                self.cell_memory.push(0);
             }
         }
     }
