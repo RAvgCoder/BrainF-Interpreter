@@ -34,14 +34,17 @@ fn main() {
     parser_optimised.generate_syntax_tree();
     parser_unoptimised.generate_syntax_tree();
 
+    let op_inst = parser_optimised.get_num_of_instr();
+    let unop_inst = parser_unoptimised.get_num_of_instr();
+    let percentage_diff = (unop_inst as f32 / op_inst as f32) * 100.0;
     println!(
         r#"
 | Number of instructions to execute:
 | Optimised: {}
 | Unoptimised: {}
+| Persentage diff in token size : {}%
     "#,
-        parser_optimised.get_num_of_instr(),
-        parser_unoptimised.get_num_of_instr()
+        op_inst, unop_inst, percentage_diff
     );
 
     // Creates the interpreter to run the code

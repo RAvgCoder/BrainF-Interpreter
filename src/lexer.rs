@@ -1,5 +1,6 @@
-use crate::grammar::Token;
 use colored::Colorize;
+
+use crate::grammar::Token;
 
 /// Struct representing a lexer for a custom language.
 #[derive(Debug)]
@@ -109,6 +110,7 @@ impl Lexer {
     /// # Returns
     ///
     /// The newline character.
+    #[inline(always)]
     fn new_line() -> char {
         0xA as char
     }
@@ -136,7 +138,7 @@ impl Lexer {
         let line_details = format!("Line={} | Col={}", self.line_num_, self.line_idx_).bold();
 
         // Printing the error message with color formatting
-        eprintln!(
+        panic!(
             r#"
         {error}: {line_details}
             {}
@@ -148,7 +150,6 @@ impl Lexer {
         );
 
         // Exiting the program with an error code
-        std::process::exit(1);
     }
 
     /// Function to extract a line containing an error.
